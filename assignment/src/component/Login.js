@@ -1,19 +1,18 @@
 import React from 'react'
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useFormik , handleChange ,handleSubmit} from 'formik';
 import *  as Yup from 'yup'
+import Swal from 'sweetalert2';
+import { useNavigate } from "react-router-dom";
 
 
 const Form = () => {
-
+ const navigate= useNavigate()
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
     password: Yup.string()
@@ -28,7 +27,16 @@ const Form = () => {
      },
      validationSchema,
      onSubmit:(data) => {
-       console.log(JSON.stringify(data,null , 2))
+      const login = data
+      const getdata  = JSON.parse(localStorage.getItem("userInfo"))
+      if(login.email != getdata.email || login.password != getdata.password)
+      {
+        return Swal.fire("Invalid Details",<h3></h3>,"warning")
+      }
+    const userData = {...getdata,isLogedIn:true}
+      localStorage.getItem("userInfo",JSON.stringify(userData)) 
+      Swal.fire(`Welcome ${getdata.firstname}`,<h3></h3>,"success") 
+      navigate("profile")   
      },
    })
   return (
@@ -42,10 +50,10 @@ const Form = () => {
           }}
           onSubmit={formik.handleSubmit}
         >
-          <Typography component="h1" variant="h5">
-            Login
+          <Typography component="h1" variant="h4">
+            Log In
           </Typography>
-          <Box component="form" sx={{ mt: 1 }}>
+          <Box component="form" sx={{ mt: 1 , width:"30%" }}>
             <TextField
               margin="normal"
               required
@@ -83,13 +91,8 @@ const Form = () => {
               Sign In
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="signin" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
@@ -101,4 +104,4 @@ const Form = () => {
   )
 }
 
-export default Form
+export default Form;
